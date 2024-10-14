@@ -21,51 +21,52 @@ test.describe("User Tests", () => {
   });
 
   test("Add new employee", async () => {
+    // Add new employee
     await page.getByRole("link", { name: "PIM" }).click();
-    await page.getByRole("button", { name: " Add" }).click();
+    await page.getByRole("button", { name: "Add" }).click();
     await page.getByPlaceholder("First Name").fill("Dragan");
     await page.getByPlaceholder("Last Name").fill("Nedeljkov");
     await page
-      .locator(
-        "//div[@class='oxd-input-group oxd-input-field-bottom-space']//div//input[@class='oxd-input oxd-input--active']"
-      )
+      .locator("div")
+      .filter({ hasText: /^Employee Id$/ })
+      .getByRole("textbox")
       .fill("2812888");
     await page.getByRole("button", { name: "Save" }).click();
   });
 
-  test("Edit employee", async () => {
+  const findEmployee = async () => {
     await page.getByRole("link", { name: "PIM" }).click();
     await page
-      .locator(
-        "//div[@class='oxd-input-group oxd-input-field-bottom-space']//div//input[@class='oxd-input oxd-input--active']"
-      )
+      .locator("div")
+      .filter({ hasText: /^Employee Id$/ })
+      .getByRole("textbox")
       .fill("2812888");
     await page.getByRole("button", { name: "Search" }).click();
+  };
+
+  test("Edit employee", async () => {
+    // Edit employee
+    await findEmployee();
     await page
-      .locator(
-        "//body[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[2]/div[3]/div[1]/div[2]/div[1]/div[1]/div[9]/div[1]/button[1]"
-      )
+      .getByRole("row", { name: "2812888" })
+      .locator("button:has(i.bi-pencil-fill)")
       .click();
     await page.getByPlaceholder("First Name").click();
     await page.getByPlaceholder("First Name").fill("AdraganEdit");
     await page
-      .locator(
-        "div[class='orangehrm-horizontal-padding orangehrm-vertical-padding'] button[type='submit']"
-      )
+      .locator("div.oxd-form-actions")
+      .nth(0)
+      .getByRole("button", { name: "Save" })
       .click();
     await page.getByRole("link", { name: "PIM" }).click();
   });
 
   test("Delete employee", async () => {
-    await page.getByRole("link", { name: "PIM" }).click();
+    // Delete employee
+    await findEmployee();
     await page
-      .locator(
-        "//div[@class='oxd-input-group oxd-input-field-bottom-space']//div//input[@class='oxd-input oxd-input--active']"
-      )
-      .fill("2812888");
-    await page.getByRole("button", { name: "Search" }).click();
-    await page
-      .locator("//div[@class='orangehrm-paper-container']//button[2]")
+      .getByRole("row", { name: "2812888" })
+      .locator("button:has(i.bi-trash)")
       .click();
     await page.getByRole("button", { name: "Yes, Delete" }).click();
     await page.getByRole("link", { name: "PIM" }).click();
